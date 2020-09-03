@@ -12,8 +12,7 @@ public:
     Q_INVOKABLE QString calculate(QString expr);
 private:
     void tokenize();
-    void strToArr(std::string &raw);
-    std::string parseFunc(std::string &func);
+    void strToArr(std::string &&raw);
     std::vector<char> charArr;
     std::vector<std::string> tokenized;
 };

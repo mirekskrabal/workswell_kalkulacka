@@ -4,7 +4,8 @@
 
 QString exprParser::calculate(QString expr)
 {
-
+    strToArr(expr.toStdString());
+    tokenize();
     charArr.clear(); //clear for next
     return expr;
 }
@@ -18,25 +19,25 @@ void exprParser::tokenize() {
             num += *i;
             ++i;
         }
-        while (isalpha(*i) && i != charArr.end()) {
-            word += *i;
-            ++i;
-        }
-        if (!isdigit(*i)) {
-            tokenized.push_back(std::string(1,*i));
-            ++i;
-        }
         if (num.length() != 0) {
             tokenized.push_back(num);
             num = "";
         }
+        while (isalpha(*i) && i != charArr.end()) {
+            word += *i;
+            ++i;
+        }
         if (word.length() != 0) {
             tokenized.push_back(word);
+            word = "";
+        }
+        if (!isdigit(*i)) {
+            tokenized.push_back(std::string(1,*i));
         }
     }
 }
 
-void exprParser::strToArr(std::string &raw){
+void exprParser::strToArr(std::string &&raw){
     for (auto i = raw.begin(); i != raw.end(); ++i) {
         if (!isspace(*i)){
             charArr.push_back(*i);
@@ -44,9 +45,6 @@ void exprParser::strToArr(std::string &raw){
     }
 }
 
-std::string exprParser::parseFunc(std::string &func)
-{
 
-}
 
 
