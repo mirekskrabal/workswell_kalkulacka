@@ -6,6 +6,7 @@ QString exprParser::calculate(QString expr)
 {
     strToArr(expr.toStdString());
     tokenize();
+    infToPostf();
     charArr.clear(); //clear for next
     return expr;
 }
@@ -51,13 +52,42 @@ void exprParser::infToPostf() {
         if (isdigit(i[0])) {
             rpnOutput.push(i);
         }
-        else if (i == "sin" || i == "cos" || i == "tg" || i == "cotg" ||
+        if (i == "sin" || i == "cos" || i == "tg" || i == "cotg" ||
             i == "exp" || i == "log" || i[0] == '-') {
             tmp.push(i);
         }
-        else{
-
+        if (i[0] != '(' && i[0] != ')'){
+            if (i[0] == '*' || i[0] == '/') {
+                while (tmp.top() == "+" || tmp.top() == "-" ||
+                       tmp.top() == "*" || tmp.top() == "/") {
+                    rpnOutput.push(tmp.top());
+                    tmp.pop();
+                }
+                tmp.push(i);
+            }
         }
+        else {
+            if (i[0] == '('){
+                tmp.push(i);
+            }
+            else {
+                while (tmp.top() != "(") {
+                    rpnOutput.push(tmp.top());
+                    tmp.pop();
+                }
+                tmp.pop();
+                auto x = tmp.top();
+                if (x ==  "sin" || x == "cos" || x == "tg" || x == "cotg" ||
+                    x == "exp" || x == "log") {
+                    rpnOutput.push(tmp.top());
+                    tmp.pop();
+                }
+            }
+        }
+    }
+    while (!tmp.empty()) {
+        rpnOutput.push(tmp.top());
+        tmp.pop();
     }
 }
 
