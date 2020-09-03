@@ -45,6 +45,22 @@ void exprParser::strToArr(std::string &&raw){
     }
 }
 
+void exprParser::infToPostf() {
+    std::stack<std::string> tmp;
+    for (auto &i : tokenized) {
+        if (isdigit(i[0])) {
+            rpnOutput.push(i);
+        }
+        else if (i == "sin" || i == "cos" || i == "tg" || i == "cotg" ||
+            i == "exp" || i == "log" || i[0] == '-') {
+            tmp.push(i);
+        }
+        else{
+
+        }
+    }
+}
+
 
 
 
