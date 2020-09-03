@@ -37,89 +37,18 @@ ApplicationWindow {
 
         /*2 layouts - one with scientific functions, one without
           using visibility of the layouts it is possible to switch between them*/
-        RowLayout {
+        CalculatorLayout {
             id: layoutWithSci
+            col: 7
+            row: 4
             visible: false
-            anchors.fill: parent
-            Repeater {
-                model: 7
-                ColumnLayout {
-                    id: currentCol
-                    property int colIndex: index
-                    Layout.alignment: maximumHeight
-                    Repeater {
-                        model: 4
-                        RoundButton {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            radius: 20
-                            text: buttonValues.buttonVals[currentCol.colIndex][index]
-
-                            palette {
-                                button: (colIndex == 4 && index == 3) ? "limegreen" :
-                                        (colIndex == 4 && index == 2) ?  "pink" :
-                                        (colIndex == 4 && index == 1) ?  "lightcoral" : "lightsteelblue";
-                            }
-                            onClicked: {
-                                if (colIndex == 4 && index == 3) {
-                                    txtResult.text += parser.calculate(plainTxtInput.text)
-                                }
-                                else if (colIndex == 4 && index == 2){
-                                    layoutNoSci.visible = !layoutNoSci.visible
-                                    layoutWithSci.visible = !layoutWithSci.visible
-                                }
-                                else if (colIndex == 4 && index == 1){
-                                    layoutNoSci.visible = !layoutNoSci.visible
-                                    layoutWithSci.visible = !layoutWithSci.visible
-                                }
-                                else{
-                                    plainTxtInput.text += buttonValues.buttonVals[currentCol.colIndex][index]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
-        RowLayout {
-            id: layoutNoSci
-            visible: true
-            anchors.fill: parent
-            Repeater {
-                model: 5
-                ColumnLayout {
-                    id: currentCol2
-                    property int colIndex: index
-                    Layout.alignment: maximumHeight
-                    Repeater {
-                        model: 4
-                        RoundButton {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            radius: 20
-                            text: buttonValues.buttonVals[currentCol2.colIndex][index]
 
-                            palette {
-                                button: (colIndex == 4 && index == 3) ? "limegreen" :
-                                        (colIndex == 4 && index == 2) ?  "pink" :
-                                        (colIndex == 4 && index == 1) ?  "lightcoral" : "lightsteelblue";
-                            }
-                            onClicked: {
-                                if (colIndex == 4 && index == 3) {
-                                    txtResult.text += parser.calculate(plainTxtInput.text)
-                                }
-                                else if (colIndex == 4 && index == 2){
-                                    layoutNoSci.visible = !layoutNoSci.visible
-                                    layoutWithSci.visible = !layoutWithSci.visible
-                                }
-                                else{
-                                    plainTxtInput.text += buttonValues.buttonVals[currentCol2.colIndex][index]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        CalculatorLayout {
+            id: layoutNoSci
+            col: 5
+            row: 4
+            visible: true
         }
     }
 
