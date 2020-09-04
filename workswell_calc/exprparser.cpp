@@ -9,7 +9,7 @@ QString ExprParser::calculate(QString expr)
     infToPostf();
     charArr.clear(); //clear for next
     tokenized.clear();
-    return evaluatePostfExpr();
+    return evaluatePostfExpr() + '\n';
 }
 
 void ExprParser::tokenize()
@@ -109,12 +109,12 @@ void ExprParser::infToPostf()
 QString ExprParser::evaluatePostfExpr()
 {
     stackToVec();
-    std::stack<int> nums;
-    int res = 0;
-    int num1, num2;
+    std::stack<double> nums;
+    double res = 0;
+    double num1, num2;
     for (auto &i : rpnVec){
         if (isdigit(i[0])){
-            nums.push(stoi(i));
+            nums.push(stod(i));
         }
         else {
             num1 = nums.top();
@@ -122,16 +122,16 @@ QString ExprParser::evaluatePostfExpr()
             num2 = nums.top();
             nums.pop();
             if (i == "+") {
-                res = num1 + num2;
+                res = num2 + num1;
             }
             else if (i == "-") {
-                res = num1 - num2;
+                res = num2 - num1;
             }
             else if (i == "*") {
-                res = num1 * num2;
+                res = num2 * num1;
             }
             else if (i == "/") {
-                res = num1 / num2;
+                res = num2 / num1;
             }
             nums.push(res);
         }
