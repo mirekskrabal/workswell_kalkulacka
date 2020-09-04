@@ -127,15 +127,18 @@ QString ExprParser::evaluatePostfExpr()
     std::stack<double> nums;
     double res = 0;
     double num1, num2;
+    //unary minus flag - once one expression will be calculated
+    int unMin = 1;
+    int unMin2 = 1;
     for (auto token = rpnVec.begin(); token != rpnVec.end(); ++token){
         if (isdigit((*token)[0])){
             nums.push(stod(*token));
         }
         else {
             if ( *token == "+" || *token == "-" || *token == "/" || *token == "*"){
-                num1 = nums.top();
+                num1 = nums.top() * unMin2;
                 nums.pop();
-                num2 = nums.top();
+                num2 = nums.top() * unMin;
                 nums.pop();
                 if (*token == "+") {
                     res = num2 + num1;
@@ -151,8 +154,17 @@ QString ExprParser::evaluatePostfExpr()
                 }
             }
             else if (*token == "m"){
-                ++token;
-                res = -stod(*token);
+                //set flag for unary minus
+                if (unMin == 1){
+                    unMin = -1;
+                    continue;
+                }
+                if (unMin == -1){
+                    unMin2 = -1;
+                    continue;
+                }
+//                ++token;
+//                res = -stod(*token);
             }
             else {
                 num1 = nums.top();
@@ -170,10 +182,13 @@ QString ExprParser::evaluatePostfExpr()
                     res = cos(num1)/sin(num1);
                 }
                 else { //functin log
-                    res = log(num1);
+                    res = log10(num1);
                 }
+                res *= unMin;
             }
             nums.push(res);
+            unMin = 1;
+            unMin2 = 1;
         }
     }
     res = nums.top();
