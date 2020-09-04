@@ -1,5 +1,5 @@
 #include "exprparser.h"
-
+#include <math.h>
 
 
 QString ExprParser::calculate(QString expr)
@@ -9,7 +9,7 @@ QString ExprParser::calculate(QString expr)
     infToPostf();
     charArr.clear(); //clear for next
     tokenized.clear();
-    return evaluatePostfExpr() + '\n';
+    return expr + " = " + evaluatePostfExpr() + '\n';
 }
 
 void ExprParser::tokenize()
@@ -91,7 +91,7 @@ void ExprParser::infToPostf()
                 tmp.pop();
                 std::string x = "";
                 if (!tmp.empty())
-                    auto x = tmp.top();
+                    x = tmp.top();
                 if (x ==  "sin" || x == "cos" || x == "tg" || x == "cotg" ||
                     x == "exp" || x == "log") {
                     rpnStack.push(tmp.top());
@@ -117,21 +117,42 @@ QString ExprParser::evaluatePostfExpr()
             nums.push(stod(i));
         }
         else {
-            num1 = nums.top();
-            nums.pop();
-            num2 = nums.top();
-            nums.pop();
-            if (i == "+") {
-                res = num2 + num1;
+            if ( i == "+" || i == "-" || i == "/" || i == "*"){
+                num1 = nums.top();
+                nums.pop();
+                num2 = nums.top();
+                nums.pop();
+                if (i == "+") {
+                    res = num2 + num1;
+                }
+                else if (i == "-") {
+                    res = num2 - num1;
+                }
+                else if (i == "*") {
+                    res = num2 * num1;
+                }
+                else { // operator '/'
+                    res = num2 / num1;
+                }
             }
-            else if (i == "-") {
-                res = num2 - num1;
-            }
-            else if (i == "*") {
-                res = num2 * num1;
-            }
-            else if (i == "/") {
-                res = num2 / num1;
+            else {
+                num1 = nums.top();
+                nums.pop();
+                if (i == "sin"){
+                    res = sin(num1);
+                }
+                else if (i == "cos"){
+                    res = 0;
+                }
+                else if (i == "tg"){
+                    res = 0;
+                }
+                else if (i == "cotg"){
+                    res = 0;
+                }
+                else { //functin log
+                    res = 0;
+                }
             }
             nums.push(res);
         }
