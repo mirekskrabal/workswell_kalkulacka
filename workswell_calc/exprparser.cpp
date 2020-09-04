@@ -17,8 +17,9 @@ void ExprParser::tokenize()
     std::string word;
     std::string num;
     std::string tmp;
-    for (auto i = charArr.begin(); i != charArr.end(); ++i) {
-        while (isdigit(*i) && i != charArr.end()) {
+    auto i = charArr.begin();
+    while (i != charArr.end()) {
+        while (i != charArr.end() && isdigit(*i)) {
             num += *i;
             ++i;
         }
@@ -26,7 +27,7 @@ void ExprParser::tokenize()
             tokenized.push_back(num);
             num = "";
         }
-        while (isalpha(*i) && i != charArr.end()) {
+        while (i != charArr.end() && isalpha(*i)) {
             word += *i;
             ++i;
         }
@@ -34,8 +35,9 @@ void ExprParser::tokenize()
             tokenized.push_back(word);
             word = "";
         }
-        if (!isdigit(*i)) {
+        if (i != charArr.end() && !isdigit(*i)) {
             tokenized.push_back(std::string(1,*i));
+            ++i;
         }
     }
 }
