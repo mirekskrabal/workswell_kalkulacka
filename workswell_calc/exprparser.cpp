@@ -52,14 +52,21 @@ void exprParser::infToPostf() {
         if (isdigit(i[0])) {
             rpnOutput.push(i);
         }
-        if (i == "sin" || i == "cos" || i == "tg" || i == "cotg" ||
+        else if (i == "sin" || i == "cos" || i == "tg" || i == "cotg" ||
             i == "exp" || i == "log" || i[0] == '-') {
             tmp.push(i);
         }
-        if (i[0] != '(' && i[0] != ')'){
+        else if (i[0] != '(' && i[0] != ')'){
             if (i[0] == '*' || i[0] == '/') {
-                while (tmp.top() == "+" || tmp.top() == "-" ||
-                       tmp.top() == "*" || tmp.top() == "/") {
+                while (!tmp.empty() && (tmp.top() == "+" || tmp.top() == "-" ||
+                       tmp.top() == "*" || tmp.top() == "/")) {
+                    rpnOutput.push(tmp.top());
+                    tmp.pop();
+                }
+                tmp.push(i);
+            }
+            else if (i[0] == '+' || i[0] == '-') {
+                while (!tmp.empty() && (tmp.top() == "+" || tmp.top() == "-" )) {
                     rpnOutput.push(tmp.top());
                     tmp.pop();
                 }
@@ -71,12 +78,14 @@ void exprParser::infToPostf() {
                 tmp.push(i);
             }
             else {
-                while (tmp.top() != "(") {
+                while (!tmp.empty() && tmp.top() != "(") {
                     rpnOutput.push(tmp.top());
                     tmp.pop();
                 }
                 tmp.pop();
-                auto x = tmp.top();
+                std::string x = "";
+                if (!tmp.empty())
+                    auto x = tmp.top();
                 if (x ==  "sin" || x == "cos" || x == "tg" || x == "cotg" ||
                     x == "exp" || x == "log") {
                     rpnOutput.push(tmp.top());
