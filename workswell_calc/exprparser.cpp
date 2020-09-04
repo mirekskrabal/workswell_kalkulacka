@@ -7,15 +7,8 @@ QString ExprParser::calculate(QString expr)
     strToArr(expr.toStdString());
     tokenize();
     infToPostf();
-    /*
-    rpnVec.clear();
-    rpnVec.push_back("-");
-    rpnVec.push_back("1");
-    rpnVec.push_back("-");
-    rpnVec.push_back("1");
-    rpnVec.push_back("*");
-    rpnVec.push_back("-");*/
-    charArr.clear(); //clear for next
+    //clear for next calculation
+    charArr.clear();
     tokenized.clear();
     return expr + " = " + evaluatePostfExpr() + '\n';
 }
@@ -36,7 +29,7 @@ void ExprParser::tokenize()
             tokenized.push_back(num);
             num = "";
         }
-        //function
+        //function was found
         while (i != charArr.end() && isalpha(*i)) {
             word += *i;
             ++i;
@@ -54,10 +47,12 @@ void ExprParser::tokenize()
     auto token = tokenized.begin();
     if (*token == "-"){
         *token = "m";
-        ++token;
+        ++token; //by this the "previous" char was already checked
     }
+    ++token;
     for (; token != tokenized.end(); ++token){
-        if (!isdigit((*(token - 1))[0]) && *(token -1) != ")"){
+        if (!isdigit((*(token - 1))[0]) && *(token -1) != ")" &&
+            *token == "-"){
             *token = "m";
         }
     }
@@ -76,11 +71,11 @@ void ExprParser::infToPostf()
 {
     std::stack<std::string> tmp;
     for (auto &i : tokenized) {
-        if (isdigit(i[0])) {
+        if (isdigit(i[0]) || i == "m") {
             rpnVec.push_back(i);
         }
         else if (i == "sin" || i == "cos" || i == "tg" || i == "cotg" ||
-            i == "exp" || i == "log" || i[0] == '-') {
+            i == "exp" || i == "log" || i[0] == 'm') {
             tmp.push(i);
         }
         else if (i[0] != '(' && i[0] != ')'){
@@ -132,42 +127,46 @@ QString ExprParser::evaluatePostfExpr()
     std::stack<double> nums;
     double res = 0;
     double num1, num2;
-    for (auto &i : rpnVec){
-        if (isdigit(i[0])){
-            nums.push(stod(i));
+    for (auto token = rpnVec.begin(); token != rpnVec.end(); ++token){
+        if (isdigit((*token)[0])){
+            nums.push(stod(*token));
         }
         else {
-            if ( i == "+" || i == "-" || i == "/" || i == "*"){
+            if ( *token == "+" || *token == "-" || *token == "/" || *token == "*"){
                 num1 = nums.top();
                 nums.pop();
                 num2 = nums.top();
                 nums.pop();
-                if (i == "+") {
+                if (*token == "+") {
                     res = num2 + num1;
                 }
-                else if (i == "-") {
+                else if (*token == "-") {
                     res = num2 - num1;
                 }
-                else if (i == "*") {
+                else if (*token == "*") {
                     res = num2 * num1;
                 }
                 else { // operator '/'
                     res = num2 / num1;
                 }
             }
+            else if (*token == "m"){
+                ++token;
+                res = -stod(*token);
+            }
             else {
                 num1 = nums.top();
                 nums.pop();
-                if (i == "sin"){
+                if (*token == "sin"){
                     res = sin(num1);
                 }
-                else if (i == "cos"){
+                else if (*token == "cos"){
                     res = cos(num1);
                 }
-                else if (i == "tg"){
+                else if (*token == "tg"){
                     res = tan(num1);
                 }
-                else if (i == "cotg"){
+                else if (*token == "cotg"){
                     res = cos(num1)/sin(num1);
                 }
                 else { //functin log
