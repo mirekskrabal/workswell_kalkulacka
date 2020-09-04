@@ -7,6 +7,14 @@ QString ExprParser::calculate(QString expr)
     strToArr(expr.toStdString());
     tokenize();
     infToPostf();
+    /*
+    rpnVec.clear();
+    rpnVec.push_back("-");
+    rpnVec.push_back("1");
+    rpnVec.push_back("-");
+    rpnVec.push_back("1");
+    rpnVec.push_back("*");
+    rpnVec.push_back("-");*/
     charArr.clear(); //clear for next
     tokenized.clear();
     return expr + " = " + evaluatePostfExpr() + '\n';
@@ -19,6 +27,7 @@ void ExprParser::tokenize()
     std::string tmp;
     auto i = charArr.begin();
     while (i != charArr.end()) {
+        //multidigit number
         while (i != charArr.end() && isdigit(*i)) {
             num += *i;
             ++i;
@@ -27,6 +36,7 @@ void ExprParser::tokenize()
             tokenized.push_back(num);
             num = "";
         }
+        //function
         while (i != charArr.end() && isalpha(*i)) {
             word += *i;
             ++i;
@@ -38,6 +48,17 @@ void ExprParser::tokenize()
         if (i != charArr.end() && !isdigit(*i)) {
             tokenized.push_back(std::string(1,*i));
             ++i;
+        }
+    }
+    //find unary minuses and mark them as "m"
+    auto token = tokenized.begin();
+    if (*token == "-"){
+        *token = "m";
+        ++token;
+    }
+    for (; token != tokenized.end(); ++token){
+        if (!isdigit((*(token - 1))[0]) && *(token -1) != ")"){
+            *token = "m";
         }
     }
 }
@@ -141,22 +162,23 @@ QString ExprParser::evaluatePostfExpr()
                     res = sin(num1);
                 }
                 else if (i == "cos"){
-                    res = 0;
+                    res = cos(num1);
                 }
                 else if (i == "tg"){
-                    res = 0;
+                    res = tan(num1);
                 }
                 else if (i == "cotg"){
-                    res = 0;
+                    res = cos(num1)/sin(num1);
                 }
                 else { //functin log
-                    res = 0;
+                    res = log(num1);
                 }
             }
             nums.push(res);
         }
     }
     res = nums.top();
+    rpnVec.clear();
     return QString::number(res);
 }
 
