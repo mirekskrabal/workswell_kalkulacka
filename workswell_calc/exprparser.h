@@ -20,12 +20,9 @@ private:
     void infToPostf();
     //evaluates postfix expression stored in rpnOutput
     QString evaluatePostfExpr();
-    //copies rpnstack to rpn vec
-    void stackToVec();
 
     std::vector<char> charArr;
     std::vector<std::string> tokenized;
-    std::stack<std::string> rpnStack;
     std::vector<std::string> rpnVec;
 };
 

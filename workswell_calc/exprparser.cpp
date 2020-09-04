@@ -56,7 +56,7 @@ void ExprParser::infToPostf()
     std::stack<std::string> tmp;
     for (auto &i : tokenized) {
         if (isdigit(i[0])) {
-            rpnStack.push(i);
+            rpnVec.push_back(i);
         }
         else if (i == "sin" || i == "cos" || i == "tg" || i == "cotg" ||
             i == "exp" || i == "log" || i[0] == '-') {
@@ -65,7 +65,7 @@ void ExprParser::infToPostf()
         else if (i[0] != '(' && i[0] != ')'){
             if (i[0] == '*' || i[0] == '/') {
                 while (!tmp.empty() && (tmp.top() == "*" || tmp.top() == "/")) {
-                    rpnStack.push(tmp.top());
+                    rpnVec.push_back(tmp.top());
                     tmp.pop();
                 }
                 tmp.push(i);
@@ -73,7 +73,7 @@ void ExprParser::infToPostf()
             else if (i[0] == '+' || i[0] == '-') {
                 while (!tmp.empty() && (tmp.top() == "+" || tmp.top() == "-" ||
                                         tmp.top() == "*" || tmp.top() == "/")) {
-                    rpnStack.push(tmp.top());
+                    rpnVec.push_back(tmp.top());
                     tmp.pop();
                 }
                 tmp.push(i);
@@ -85,7 +85,7 @@ void ExprParser::infToPostf()
             }
             else {
                 while (!tmp.empty() && tmp.top() != "(") {
-                    rpnStack.push(tmp.top());
+                    rpnVec.push_back(tmp.top());
                     tmp.pop();
                 }
                 tmp.pop();
@@ -94,21 +94,20 @@ void ExprParser::infToPostf()
                     x = tmp.top();
                 if (x ==  "sin" || x == "cos" || x == "tg" || x == "cotg" ||
                     x == "exp" || x == "log") {
-                    rpnStack.push(tmp.top());
+                    rpnVec.push_back(tmp.top());
                     tmp.pop();
                 }
             }
         }
     }
     while (!tmp.empty()) {
-        rpnStack.push(tmp.top());
+        rpnVec.push_back(tmp.top());
         tmp.pop();
     }
 }
 
 QString ExprParser::evaluatePostfExpr()
 {
-    stackToVec();
     std::stack<double> nums;
     double res = 0;
     double num1, num2;
@@ -159,19 +158,6 @@ QString ExprParser::evaluatePostfExpr()
     }
     res = nums.top();
     return QString::number(res);
-}
-
-void ExprParser::stackToVec()
-{
-    std::stack<std::string> tmp;
-    while (!rpnStack.empty()){
-        tmp.push(move(rpnStack.top()));
-        rpnStack.pop();
-    }
-    while (!tmp.empty()){
-        rpnVec.push_back(move(tmp.top()));
-        tmp.pop();
-    }
 }
 
 
