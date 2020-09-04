@@ -4,12 +4,12 @@
 #include <QObject>
 #include <stack>
 
-class exprParser : public QObject
+class ExprParser : public QObject
 {
     Q_OBJECT
 public:
-    exprParser(){};
-    virtual ~exprParser() {}
+    ExprParser(){};
+    virtual ~ExprParser() {}
     Q_INVOKABLE QString calculate(QString expr);
 private:
     //tokenizes input
@@ -18,9 +18,15 @@ private:
     void strToArr(std::string &&raw);
     //parses tokenized input to rpn using shunting yard algorithm
     void infToPostf();
+    //evaluates postfix expression stored in rpnOutput
+    QString evaluatePostfExpr();
+    //copies rpnstack to rpn vec
+    void stackToVec();
+
     std::vector<char> charArr;
     std::vector<std::string> tokenized;
-    std::stack<std::string> rpnOutput;
+    std::stack<std::string> rpnStack;
+    std::vector<std::string> rpnVec;
 };
 
 #endif // EXPRPARSER_H

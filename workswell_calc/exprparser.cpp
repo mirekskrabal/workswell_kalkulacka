@@ -106,7 +106,36 @@ void ExprParser::infToPostf()
 
 QString ExprParser::evaluatePostfExpr()
 {
-
+    stackToVec();
+    std::stack<int> nums;
+    int res = 0;
+    int num1, num2;
+    for (auto &i : rpnVec){
+        if (isdigit(i[0])){
+            nums.push(stoi(i));
+        }
+        else {
+            num1 = nums.top();
+            nums.pop();
+            num2 = nums.top();
+            nums.pop();
+            if (i == "+") {
+                res = num1 + num2;
+            }
+            else if (i == "-") {
+                res = num1 - num2;
+            }
+            else if (i == "*") {
+                res = num1 * num2;
+            }
+            else if (i == "/") {
+                res = num1 / num2;
+            }
+            nums.push(res);
+        }
+    }
+    res = nums.top();
+    return QString::number(res);
 }
 
 void ExprParser::stackToVec()
