@@ -21,7 +21,7 @@ void ExprParser::tokenize()
     auto i = charArr.begin();
     while (i != charArr.end()) {
         //multidigit number
-        while (i != charArr.end() && isdigit(*i)) {
+        while (i != charArr.end() && (isdigit(*i) || *i == '.')) {
             num += *i;
             ++i;
         }
