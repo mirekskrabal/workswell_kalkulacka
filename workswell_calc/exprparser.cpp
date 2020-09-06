@@ -47,7 +47,7 @@ void ExprParser::tokenize()
     auto token = tokenized.begin();
     if (*token == "-"){
         *token = "m";
-        ++token; //by this the "previous" char was already checked
+        ++token;
     }
     ++token;
     for (; token != tokenized.end(); ++token){
@@ -61,6 +61,7 @@ void ExprParser::tokenize()
 void ExprParser::strToArr(std::string &&raw)
 {
     for (auto i = raw.begin(); i != raw.end(); ++i) {
+        //skip ws
         if (!isspace(*i)){
             charArr.push_back(*i);
         }
@@ -71,7 +72,7 @@ void ExprParser::infToPostf()
 {
     std::stack<std::string> tmp;
     for (auto &i : tokenized) {
-        if (isdigit(i[0]) || i == "m") {
+        if (isdigit(i[0])) {
             rpnVec.push_back(i);
         }
         else if (i == "sin" || i == "cos" || i == "tg" || i == "cotg" ||
@@ -80,15 +81,18 @@ void ExprParser::infToPostf()
         }
         else if (i[0] != '(' && i[0] != ')'){
             if (i[0] == '*' || i[0] == '/') {
-                while (!tmp.empty() && (tmp.top() == "*" || tmp.top() == "/")) {
+                //pop all operators will higher or equal precedence
+                while (!tmp.empty() && (tmp.top() == "*" || tmp.top() == "/" || tmp.top() == "m")) {
                     rpnVec.push_back(tmp.top());
                     tmp.pop();
                 }
                 tmp.push(i);
             }
+            //pop all operators will higher or equal precedence
             else if (i[0] == '+' || i[0] == '-') {
                 while (!tmp.empty() && (tmp.top() == "+" || tmp.top() == "-" ||
-                                        tmp.top() == "*" || tmp.top() == "/")) {
+                                        tmp.top() == "*" || tmp.top() == "/" |    //unary minus flag - once one expression will be calculated|
+                                        tmp.top() == "m")) {
                     rpnVec.push_back(tmp.top());
                     tmp.pop();
                 }
@@ -109,7 +113,7 @@ void ExprParser::infToPostf()
                 if (!tmp.empty())
                     x = tmp.top();
                 if (x ==  "sin" || x == "cos" || x == "tg" || x == "cotg" ||
-                    x == "exp" || x == "log") {
+                    x == "exp" || x == "log" || x == "m") {
                     rpnVec.push_back(tmp.top());
                     tmp.pop();
                 }
@@ -125,20 +129,18 @@ void ExprParser::infToPostf()
 QString ExprParser::evaluatePostfExpr()
 {
     std::stack<double> nums;
-    double res = 0;
-    double num1, num2;
-    //unary minus flag - once one expression will be calculated
-    int unMin = 1;
-    int unMin2 = 1;
+    double res = 0; //stores results of suboperations
+    double num1, num2; //operands of suboperations
     for (auto token = rpnVec.begin(); token != rpnVec.end(); ++token){
+        //operands are pushed to the stack
         if (isdigit((*token)[0])){
             nums.push(stod(*token));
         }
-        else {
+        else {//pop all needed operands for given operation and store the result in res
             if ( *token == "+" || *token == "-" || *token == "/" || *token == "*"){
-                num1 = nums.top() * unMin2;
+                num1 = nums.top();
                 nums.pop();
-                num2 = nums.top() * unMin;
+                num2 = nums.top();
                 nums.pop();
                 if (*token == "+") {
                     res = num2 + num1;
@@ -153,18 +155,10 @@ QString ExprParser::evaluatePostfExpr()
                     res = num2 / num1;
                 }
             }
-            else if (*token == "m"){
-                //set flag for unary minus
-                if (unMin == 1){
-                    unMin = -1;
-                    continue;
-                }
-                if (unMin == -1){
-                    unMin2 = -1;
-                    continue;
-                }
-//                ++token;
-//                res = -stod(*token);
+            else if (*token == "m"){//unary minus ecountered - it immediately follows its operand
+                                    //it is needed to multiply the operand on the top by -1
+                res = nums.top() * -1;
+                nums.pop();
             }
             else {
                 num1 = nums.top();
@@ -184,16 +178,14 @@ QString ExprParser::evaluatePostfExpr()
                 else { //functin log
                     res = log10(num1);
                 }
-                res *= unMin;
             }
             nums.push(res);
-            unMin = 1;
-            unMin2 = 1;
         }
     }
     res = nums.top();
+    lastRes = QString::number(res);
     rpnVec.clear();
-    return QString::number(res);
+    return lastRes;
 }
 
 
