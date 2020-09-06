@@ -18,17 +18,7 @@ ApplicationWindow {
             height: 20
     }
 
-    //stores button text values
-    Item{
-        id: buttonValues
-        property var buttonVals: [["7","4","1", "0"], ["8","5","2", ","],
-                                  ["9","6","3", "%"], ["/", "*", "-", "+"],
-                                  ["()", "C", "sci mode", "="],
-                                  ["sin", "cos", "tg", "cotg"],
-                                   ["exp", "log", "pi", "e"]];
-    }
-
-    //creating buttons
+    //calculator button layouts
     Item {
         id: buttons
         anchors.left: parent.left; anchors.bottom: parent.bottom
@@ -60,12 +50,17 @@ ApplicationWindow {
         border.color: "grey"
         border.width: 2
         anchors.margins: 3
-
-        TextArea {
-            id: plainTxtInput
+        TextField {
+            id: txtInput
+            placeholderText: qsTr("Input expression:")
             anchors.fill: parent
             anchors.margins: 4
+            Keys.onReturnPressed: {
+                txtResult.text += parser.calculate(txtInput.text)
+                txtInput.text = parser.res
+            }
         }
+
     }
 
     Rectangle {
@@ -75,10 +70,13 @@ ApplicationWindow {
         border.color: "grey"
         border.width: 2
         anchors.margins: 3
-
-        TextArea {
-            id: txtResult
+        ScrollView {
+            id: view
             anchors.fill: parent
+            TextArea {
+               id: txtResult
+               anchors.fill: parent
+            }
         }
     }
 }
