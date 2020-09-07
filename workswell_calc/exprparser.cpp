@@ -1,16 +1,24 @@
 #include "exprparser.h"
 #include <math.h>
 
-
 QString ExprParser::calculate(QString expr)
 {
+    prevExpr = expr;
     strToArr(expr.toStdString());
     tokenize();
-    infToPostf();
+    try {
+         infToPostf();
+         evaluatePostfExpr();
+    }  catch (const std::invalid_argument &ia) {
+        clear();
+        invalid = true;
+        return ia.what();
+    }
     //clear for next calculation
-    charArr.clear();
-    tokenized.clear();
-    return expr + " = " + evaluatePostfExpr() + '\n';
+    clear();
+    invalid = false; //no invalid argument was encountered
+    return expr + " = " + QString::fromStdString(lastRes) + '\n';
+
 }
 
 void ExprParser::tokenize()
@@ -63,6 +71,8 @@ void ExprParser::strToArr(std::string &&raw)
     for (auto i = raw.begin(); i != raw.end(); ++i) {
         //skip ws
         if (!isspace(*i)){
+            if(*i == ',')
+                *i = '.';
             charArr.push_back(*i);
         }
     }
@@ -76,13 +86,14 @@ void ExprParser::infToPostf()
             rpnVec.push_back(i);
         }
         else if (i == "sin" || i == "cos" || i == "tg" || i == "cotg" ||
-            i == "exp" || i == "log" || i[0] == 'm') {
+            i == "exp" || i == "log" || i[0] == 'm' || i[0] == '^') {
             tmp.push(i);
         }
         else if (i[0] != '(' && i[0] != ')'){
             if (i[0] == '*' || i[0] == '/') {
                 //pop all operators will higher or equal precedence
-                while (!tmp.empty() && (tmp.top() == "*" || tmp.top() == "/" || tmp.top() == "m")) {
+                while (!tmp.empty() && (tmp.top() == "*" || tmp.top() == "/" || tmp.top() == "m"
+                                        || tmp.top() == "^")) {
                     rpnVec.push_back(tmp.top());
                     tmp.pop();
                 }
@@ -92,22 +103,27 @@ void ExprParser::infToPostf()
             else if (i[0] == '+' || i[0] == '-') {
                 while (!tmp.empty() && (tmp.top() == "+" || tmp.top() == "-" ||
                                         tmp.top() == "*" || tmp.top() == "/" |    //unary minus flag - once one expression will be calculated|
-                                        tmp.top() == "m")) {
+                                        tmp.top() == "m" || tmp.top() == "^")) {
                     rpnVec.push_back(tmp.top());
                     tmp.pop();
                 }
                 tmp.push(i);
+            }
+            else { //invalid input encountered
+                throw std::invalid_argument("Invalid argument!\n");
             }
         }
         else {
             if (i[0] == '('){
                 tmp.push(i);
             }
-            else {
+            else if (i[0] == ')') {
                 while (!tmp.empty() && tmp.top() != "(") {
                     rpnVec.push_back(tmp.top());
                     tmp.pop();
                 }
+                if (tmp.empty()) //parenthesis mismatch
+                    throw std::invalid_argument("Parentheses mismatch!\n");
                 tmp.pop();
                 std::string x = "";
                 if (!tmp.empty())
@@ -118,15 +134,20 @@ void ExprParser::infToPostf()
                     tmp.pop();
                 }
             }
+            else {//invalid input encountered
+                throw std::invalid_argument("Invalid argument!\n");
+            }
         }
     }
     while (!tmp.empty()) {
+        if (tmp.top() == ")" || tmp.top() == "(") //parenthesis mismatch
+            throw std::invalid_argument("Parentheses mismatch!\n");
         rpnVec.push_back(tmp.top());
         tmp.pop();
     }
 }
 
-QString ExprParser::evaluatePostfExpr()
+void ExprParser::evaluatePostfExpr()
 {
     std::stack<double> nums;
     double res = 0; //stores results of suboperations
@@ -137,9 +158,15 @@ QString ExprParser::evaluatePostfExpr()
             nums.push(stod(*token));
         }
         else {//pop all needed operands for given operation and store the result in res
-            if ( *token == "+" || *token == "-" || *token == "/" || *token == "*"){
+            if (nums.empty()){
+                throw std::invalid_argument("Invalid argument!\n");
+            }
+            if ( *token == "+" || *token == "-" || *token == "/" || *token == "*" || *token == "^" ){
                 num1 = nums.top();
                 nums.pop();
+                if (nums.empty()){
+                    throw std::invalid_argument("Invalid argument!\n");
+                }
                 num2 = nums.top();
                 nums.pop();
                 if (*token == "+") {
@@ -151,8 +178,11 @@ QString ExprParser::evaluatePostfExpr()
                 else if (*token == "*") {
                     res = num2 * num1;
                 }
-                else { // operator '/'
+                else if (*token == "/"){
                     res = num2 / num1;
+                }
+                else{ //^ operator
+                    res = pow(num2, num1);
                 }
             }
             else if (*token == "m"){//unary minus ecountered - it immediately follows its operand
@@ -182,10 +212,18 @@ QString ExprParser::evaluatePostfExpr()
             nums.push(res);
         }
     }
+    if (nums.size() != 1){
+        throw std::invalid_argument("Invalid argument!\n");
+    }
     res = nums.top();
-    lastRes = QString::number(res);
+    lastRes = std::to_string(res);
+}
+
+void ExprParser::clear()
+{
+    charArr.clear();
+    tokenized.clear();
     rpnVec.clear();
-    return lastRes;
 }
 
 
