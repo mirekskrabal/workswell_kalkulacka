@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <clocale>
 #include "exprparser.h"
 
 int main(int argc, char *argv[])
@@ -9,9 +10,11 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
 
+    std::setlocale(LC_NUMERIC,"C");
+
     QQmlApplicationEngine engine;
     QQmlContext* context(engine.rootContext());
-    context->setContextProperty("parser", new exprParser());
+    context->setContextProperty("parser", new ExprParser());
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

@@ -6,11 +6,12 @@ RowLayout {
     anchors.fill: parent
     property int col: 0
     property int  row: 0
-    property var buttonVals: [["7","4","1", "0"], ["8","5","2", ","],
-                              ["9","6","3", "%"], ["/", "*", "-", "+"],
-                              ["()", "C", "sci mode", "="],
-                              ["sin", "cos", "tg", "cotg"],
-                               ["exp", "log", "pi", "e"]];
+    //stores button text values
+    property var buttonVals: [["7","4","1", "0"], ["8","5","2", "."],
+                              ["9","6","3", "+"], ["(", "*", "/", "-"],
+                              [")", "C", "sci mode", "="],
+                              ["sin()", "cos()", "tg()", "cotg()"],
+                               ["log()", "^", "pi", "e"]];
     Repeater {
         model: col
         ColumnLayout {
@@ -23,7 +24,7 @@ RowLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     radius: 20
-                    text: buttonValues.buttonVals[currentCol.colIndex][index]
+                    text: buttonVals[currentCol.colIndex][index]
 
                     palette {
                         button: (colIndex == 4 && index == 3) ? "limegreen" :
@@ -32,14 +33,19 @@ RowLayout {
                     }
                     onClicked: {
                         if (colIndex == 4 && index == 3) {
-                            txtResult.text += parser.calculate(plainTxtInput.text)
+                            txtResult.text += parser.calculate(txtInput.text)
+                            txtInput.text = parser.res
                         }
                         else if (colIndex == 4 && index == 2){
                             layoutNoSci.visible = !layoutNoSci.visible
                             layoutWithSci.visible = !layoutWithSci.visible
                         }
+                        else if (colIndex == 4 && index == 1) {
+                            txtInput.text = ""
+                        }
+
                         else{
-                            plainTxtInput.text += buttonValues.buttonVals[currentCol.colIndex][index]
+                            txtInput.text += buttonVals[currentCol.colIndex][index]
                         }
                     }
                 }

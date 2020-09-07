@@ -13,7 +13,7 @@ public:
     //invokes all function calls needed to evaluate given expression
     Q_INVOKABLE QString calculate(QString expr);
     Q_PROPERTY(QString res READ getRes);
-    QString getRes() const {if (!invalid) return QString::fromStdString(lastRes); else return prevExpr;}
+    QString getRes() const {if (!invalid) return QString::number(lastRes); else return prevExpr;}
 private:
     //tokenizes input
     void tokenize();
@@ -33,8 +33,8 @@ private:
     //tokenized input in reversed polish notation
     std::vector<std::string> rpnVec;
     //stores last calculated result
-//    double lastRes;
-    std::string lastRes;
+    double lastRes;
+//    d lastRes;
     //previous expression was invalid
     bool invalid;
     //string of previous expression

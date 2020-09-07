@@ -1,5 +1,6 @@
 #include "exprparser.h"
 #include <math.h>
+#include <QDebug>
 
 QString ExprParser::calculate(QString expr)
 {
@@ -17,7 +18,7 @@ QString ExprParser::calculate(QString expr)
     //clear for next calculation
     clear();
     invalid = false; //no invalid argument was encountered
-    return expr + " = " + QString::fromStdString(lastRes) + '\n';
+    return expr + " = " + QString::number(lastRes) + '\n';
 
 }
 
@@ -216,7 +217,7 @@ void ExprParser::evaluatePostfExpr()
         throw std::invalid_argument("Invalid argument!\n");
     }
     res = nums.top();
-    lastRes = std::to_string(res);
+    lastRes = res;
 }
 
 void ExprParser::clear()

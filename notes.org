@@ -77,10 +77,39 @@
     table of buttons anchored to bottom of the window
     - provides number, operators etc. which user interacts with
 
-** context property
-   QQmlContext class - exposes data to the context of a qml object so that the data can be reerred to directly
-   from within the scope of the qml code
-
+* Connecting c++ and qml
+  c++ objects and values can be embedded directly into the context of loaded qml objects using context properties
+  and context objects - this is achieved through the *QQmlContext* class which exposes data to the context of a QML
+  component, allowing data to be injected from C++ into QML
+  QQmlContext class:
+  - exposes data to the context of a qml object so that the data can be referred to directly
+    from within the scope of the qml code
+  - each QQmlContext contains a set of properties, distinct from its QObject properties, that allow data
+    to be explicitly bound to a context by name
+  context form a hierarchy - root is qml engine's root context (data that should be available to all all qml
+  component instances instantiated by the engine should be pt in the root context)
+  - additional data that should be available to a subset of component instances should be added to sub-contexts
+    parented to the root context
+    - child contexts inherit the context properties of their parents
+** context properties
+   expose context properties via setContextProperty method
+   possible to expose value types supperted by QVariant and pointer to QObjects
+** context objects
+   to simplify binding and maintaining large data sets, all properites of an obj can be exposed with
+   *setContextObject* -> all the properties of the context obj are available by name in the context
+  
+  when a QObject instance is exposed with setContextProperty, the obj's properties, signals, slots, methods
+  market with Q_INVOKABLE, and enums registered with Q_ENUM, are accessible from QML
+    
 ** signal and handler event system
    signal - event X signal handler - response
    when a signal is emitted, corespoding signal handler is invoked
+   
+** defining custom qml object types
+   placed in <TypeName>.qml file
+
+**  notations
+    infix 2 + 2
+    postfix 2 2 +
+    prefix + 2 2
+   

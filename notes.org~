@@ -1,0 +1,18 @@
+* qt quick module
+  lib for writing qml apps
+  provides basic types for creating user interfaces (ui, animating, views..)
+** visual canvas
+   two dimensional canvas with z-ordering
+   top-left pixel is the [0,0] pixel
+   visual parent:
+   - owenership-parent - determines obj lifetime semantics
+   - visual-parent - determines where on the canvas an item is drawn)
+
+** positioning
+   anchoring - items are anchored to each other at certain boundaries
+   
+
+*** z-order
+    ordering of overlapping 2d objects
+    determines which window appears on top of the other (order on the z
+    axis)
