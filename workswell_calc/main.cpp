@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     QQmlContext* context(engine.rootContext());
-    context->setContextProperty("parser", new exprParser());
+    context->setContextProperty("parser", new ExprParser());
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

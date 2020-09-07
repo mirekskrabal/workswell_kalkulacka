@@ -10,7 +10,6 @@ ApplicationWindow {
     height: 480
     visible: true
     title: qsTr("Calculator")
-
     Rectangle {
             id: appMenu
             anchors.top: parent.top;
@@ -55,6 +54,7 @@ ApplicationWindow {
             placeholderText: qsTr("Input expression:")
             anchors.fill: parent
             anchors.margins: 4
+            //evaluate expression when return is pressed
             Keys.onReturnPressed: {
                 txtResult.text += parser.calculate(txtInput.text)
                 txtInput.text = parser.res
